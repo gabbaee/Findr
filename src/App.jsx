@@ -1,3 +1,4 @@
+
 import {
   HashRouter,
   Routes,
@@ -9,11 +10,12 @@ import Navbar from "./components/Navbar";
 import Marketplace from "./pages/Marketplace";
 import CreateListing from "./pages/CreateListing";
 import LostAndFound from "./pages/LostAndFound";
+import CreateLostFound from "./pages/CreateLostFound";
 import Tambayan from "./pages/Tambayan";
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <div className="app-container">
         <Navbar />
 
@@ -37,10 +39,15 @@ function App() {
             path="/lost-and-found"
             element={<LostAndFound />}
           />
-        
-          <Route 
-            path="/tambayan" 
-            element={<Tambayan />} 
+
+          <Route
+            path="/lost-and-found/create"
+            element={<CreateLostFound />}
+          />
+
+          <Route
+            path="/tambayan"
+            element={<Tambayan />}
           />
         </Routes>
 
@@ -54,7 +61,7 @@ function App() {
           </span>
         </footer>
       </div>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
