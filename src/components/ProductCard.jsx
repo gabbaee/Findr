@@ -1,4 +1,3 @@
-
 export default function ProductCard({ product }) {
   return (
     <article className="product-card">

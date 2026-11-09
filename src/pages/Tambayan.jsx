@@ -1,6 +1,8 @@
-
 import { useState } from "react";
 import { Clock3 } from "lucide-react";
+import RoomModal from "../components/RoomModal";
+import "../styles/room-modal.css";
+import { imagePath } from "../utils/imagePath";
 
 const rooms = [
   {
@@ -10,7 +12,7 @@ const rooms = [
     buildingCode: "LB",
     vacantFrom: "10:00 AM",
     vacantUntil: "12:30 PM",
-    image: "/images/lawrence-bunzel.jpg"
+    image: imagePath("lawrence-bunzel.jpg")
   },
   {
     id: 2,
@@ -19,7 +21,7 @@ const rooms = [
     buildingCode: "MR",
     vacantFrom: "11:30 AM",
     vacantUntil: "02:00 PM",
-    image: "/images/michael-richartz.jpg"
+    image: imagePath("michael-richartz.jpg")
   },
   {
     id: 3,
@@ -28,7 +30,7 @@ const rooms = [
     buildingCode: "RH",
     vacantFrom: "09:00 AM",
     vacantUntil: "12:00 PM",
-    image: "/images/robert-hoeppener.jpg"
+    image: imagePath("robert-hoeppener.jpg")
   },
   {
     id: 4,
@@ -37,7 +39,7 @@ const rooms = [
     buildingCode: "AF",
     vacantFrom: "01:00 PM",
     vacantUntil: "03:30 PM",
-    image: "/images/safad-building.jpg"
+    image: imagePath("safad-building.jpg")
   },
   {
     id: 5,
@@ -46,7 +48,7 @@ const rooms = [
     buildingCode: "LB",
     vacantFrom: "10:30 AM",
     vacantUntil: "01:00 PM",
-    image: "/images/lawrence-bunzel.jpg"
+    image: imagePath("lawrence-bunzel.jpg")
   },
   {
     id: 6,
@@ -55,7 +57,7 @@ const rooms = [
     buildingCode: "MR",
     vacantFrom: "02:00 PM",
     vacantUntil: "04:30 PM",
-    image: "/images/michael-richartz.jpg"
+    image: imagePath("michael-richartz.jpg")
   }
 ];
 
@@ -67,11 +69,25 @@ const buildings = [
   { code: "AF", label: "AF (SAFAD Building)" }
 ];
 
-function RoomCard({ room }) {
+function RoomCard({ room, onClick }) {
   return (
-    <article className="listing-card">
+    <article
+      className="listing-card"
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onClick();
+        }
+      }}
+    >
       <div className="listing-image">
-        <img src={room.image} alt={room.building} />
+        <img
+          src={room.image}
+          alt={room.building}
+        />
       </div>
 
       <div className="listing-info">
@@ -92,12 +108,27 @@ function RoomCard({ room }) {
 
 export default function Tambayan() {
   const [selectedBuilding, setSelectedBuilding] = useState("All");
+  const [selectedRoom, setSelectedRoom] = useState(null);
 
   const filteredRooms = rooms.filter(
     (room) =>
       selectedBuilding === "All" ||
       room.buildingCode === selectedBuilding
   );
+
+  const openRoomModal = (room) => {
+    setSelectedRoom({
+      ...room,
+      room: room.code,
+      time: `${room.vacantFrom} – ${room.vacantUntil}`,
+      date: "September 19, Tuesday",
+      asOf: "As of 2:08pm"
+    });
+  };
+
+  const closeRoomModal = () => {
+    setSelectedRoom(null);
+  };
 
   return (
     <main className="listing-page tambayan-page">
@@ -137,7 +168,11 @@ export default function Tambayan() {
 
         <div className="listing-grid three-columns">
           {filteredRooms.map((room) => (
-            <RoomCard key={room.id} room={room} />
+            <RoomCard
+              key={room.id}
+              room={room}
+              onClick={() => openRoomModal(room)}
+            />
           ))}
         </div>
 
@@ -147,6 +182,11 @@ export default function Tambayan() {
           </div>
         )}
       </section>
+
+      <RoomModal
+        room={selectedRoom}
+        onClose={closeRoomModal}
+      />
     </main>
   );
 }

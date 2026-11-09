@@ -1,238 +1,130 @@
-
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Search, MapPin, CalendarDays } from "lucide-react";
+import LostFoundHeader from "../components/LostFoundHeader";
+import "../styles/lost-found-pages.css";
+import { imagePath } from "../utils/imagePath";
 
-const reports = [
+const items = [
   {
     id: 1,
-    name: 'MacBook Pro 14"',
-    category: "Electronics",
-    status: "Lost",
-    location: "MR301",
-    campus: "Downtown Campus",
-    date: "Oct 24, 2026",
-    image: "/images/lost-macbook.jpg"
+    title: "Hydro Flask (Yellow)",
+    type: "Found",
+    category: "Daily Essentials",
+    campus: "Talamban Campus",
+    location: "Basketball Court",
+    date: "Oct 23, 2026",
+    image: imagePath("yellow-flask.jpg")
   },
   {
     id: 2,
-    name: "USC Card & Leather Wallet",
+    title: "USC Card & Leather Wallet",
+    type: "Found",
     category: "Personal IDs",
-    status: "Found",
-    location: "Basketball Court",
     campus: "Talamban Campus",
+    location: "Basketball Court",
     date: "Oct 24, 2026",
-    image: "/images/found-wallet.jpg"
+    image: imagePath("wallet.jpg")
   },
   {
     id: 3,
-    name: "Sony WH-1000XM4",
-    category: "Audio",
-    status: "Lost",
-    location: "Bunzel Lobby",
+    title: "AirPods Pro Gen 2",
+    type: "Lost",
+    category: "Electronics",
     campus: "Downtown Campus",
-    date: "Oct 23, 2026",
-    image: "/images/lost-headphones.jpg"
+    location: "Library",
+    date: "Oct 25, 2026",
+    image: imagePath("airpods.jpg")
   },
   {
     id: 4,
-    name: "Hydro Flask (Yellow)",
-    category: "Daily Essentials",
-    status: "Found",
-    location: "Basketball Court",
-    campus: "Talamban Campus",
-    date: "Oct 23, 2026",
-    image: "/images/found-flask.jpg"
-  },
-  {
-    id: 5,
-    name: "Car Keys (Tesla)",
-    category: "Keys & Access",
-    status: "Lost",
-    location: "Bunzel Canteen",
-    campus: "Downtown Campus",
-    date: "Oct 22, 2026",
-    image: "/images/lost-keys.jpg"
-  },
-  {
-    id: 6,
-    name: "AirPods Pro Gen 2",
-    category: "Audio",
-    status: "Found",
-    location: "RH102",
-    campus: "Talamban Campus",
-    date: "Oct 22, 2026",
-    image: "/images/found-airpods.jpg"
-  },
-  {
-    id: 7,
-    name: "Gold Rimmed Glasses",
+    title: "Red Cap",
+    type: "Found",
     category: "Accessories",
-    status: "Lost",
-    location: "Soccer Field",
     campus: "Talamban Campus",
-    date: "Oct 21, 2026",
-    image: "/images/lost-glasses.jpg"
-  },
-  {
-    id: 8,
-    name: "Red Cap",
-    category: "Apparel",
-    status: "Found",
-    location: "Bunzel Parking Area",
-    campus: "Downtown Campus",
-    date: "Oct 21, 2026",
-    image: "/images/found-cap.jpg"
+    location: "Main Entrance",
+    date: "Oct 26, 2026",
+    image: imagePath("red-cap.jpg")
   }
 ];
 
-const filters = ["All Items", "Lost Only", "Found Only"];
-
-function ReportCard({ report }) {
-  return (
-    <article className="lostfound-card">
-      <div className="lostfound-image">
-        <img src={report.image} alt={report.name} />
-
-        <span
-          className={`lostfound-status ${report.status.toLowerCase()}`}
-        >
-          <span className="status-dot" />
-          {report.status}
-        </span>
-      </div>
-
-      <div className="lostfound-info">
-        <span className="lostfound-category">
-          {report.category}
-        </span>
-
-        <h3>{report.name}</h3>
-
-        <p>
-          <MapPin size={13} />
-          {report.location}
-        </p>
-
-        <p>
-          <CalendarDays size={13} />
-          {report.status} {report.date}
-        </p>
-      </div>
-    </article>
-  );
-}
-
 export default function LostAndFound() {
-  const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const [campus, setCampus] = useState("All Campuses");
-  const [activeFilter, setActiveFilter] = useState("All Items");
+  const [filter, setFilter] = useState("All");
 
-  const filteredReports = reports.filter((report) => {
-    const searchTerm = search.toLowerCase().trim();
+  const filtered = items.filter((item) => {
+    const matchesType = filter === "All" || item.type === filter;
+    const matchesSearch = [
+      item.title,
+      item.category,
+      item.campus,
+      item.location
+    ].some((value) => value.toLowerCase().includes(search.toLowerCase()));
 
-    const matchesSearch =
-      report.name.toLowerCase().includes(searchTerm) ||
-      report.category.toLowerCase().includes(searchTerm) ||
-      report.location.toLowerCase().includes(searchTerm);
-
-    const matchesCampus =
-      campus === "All Campuses" ||
-      report.campus === campus;
-
-    const matchesStatus =
-      activeFilter === "All Items" ||
-      report.status === activeFilter.replace(" Only", "");
-
-    return matchesSearch && matchesCampus && matchesStatus;
+    return matchesType && matchesSearch;
   });
 
-  function handleSearch(e) {
-    e.preventDefault();
-    setSearch(searchInput);
-  }
-
   return (
-    <main className="lostfound-page">
-      <div className="lostfound-top-action">
-        <Link to="/lost-and-found/post" className="lostfound-post-btn">
-          + Post Item
-        </Link>
+    <main className="lf-page">
+      <LostFoundHeader />
+
+      <div className="lf-section-heading">
+        <div>
+          <h2>Lost & Found Items</h2>
+          <p>Browse items reported by the Carolinian community.</p>
+        </div>
       </div>
 
-      <section className="lostfound-hero">
-        <h1>
-          Lost something on campus?{" "}
-          <span>We'll help you find it.</span>
-        </h1>
-
-        <form
-          className="lostfound-search"
-          onSubmit={handleSearch}
-        >
-          <Search size={20} className="lostfound-search-icon" />
-
-          <input
-            type="text"
-            placeholder="Search keys, wallets, phones, water bottles, classes..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-          />
-
-          <select
-            value={campus}
-            onChange={(e) => setCampus(e.target.value)}
-            aria-label="Filter by campus"
-          >
-            <option value="All Campuses">All Campuses</option>
-            <option value="Talamban Campus">
-              Talamban Campus
-            </option>
-            <option value="Downtown Campus">
-              Downtown Campus
-            </option>
-          </select>
-
-          <button type="submit">Search</button>
-        </form>
-      </section>
-
-      <section className="lostfound-listings">
-        <div className="lostfound-listings-header">
-          <div className="lostfound-listing-title">
-            <h2>Recent Reports</h2>
-            <span>• {filteredReports.length} items displayed</span>
-          </div>
-
-          <div className="lostfound-filters">
-            {filters.map((filter) => (
-              <button
-                key={filter}
-                type="button"
-                className={activeFilter === filter ? "selected" : ""}
-                onClick={() => setActiveFilter(filter)}
-              >
-                {filter}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="lostfound-grid">
-          {filteredReports.map((report) => (
-            <ReportCard key={report.id} report={report} />
+      <div className="lf-toolbar">
+        <div className="lf-filter-buttons">
+          {["All", "Lost", "Found"].map((type) => (
+            <button
+              key={type}
+              type="button"
+              className={filter === type ? "active" : ""}
+              onClick={() => setFilter(type)}
+            >
+              {type === "All" ? "All Items" : type}
+            </button>
           ))}
         </div>
 
-        {filteredReports.length === 0 && (
-          <div className="lostfound-empty">
-            <Search size={28} />
-            <h3>No reports found</h3>
-            <p>Try another keyword, campus, or status filter.</p>
-          </div>
-        )}
-      </section>
+        <div className="lf-search">
+          <Search size={16} />
+          <input
+            type="search"
+            placeholder="Search items..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="lf-items-grid">
+        {filtered.map((item) => (
+          <article className="lf-item-card" key={item.id}>
+            <div className="lf-item-image">
+              <img
+                src={item.image}
+                alt={item.title}
+              />
+              <span className={`lf-item-badge ${item.type.toLowerCase()}`}>
+                {item.type}
+              </span>
+            </div>
+
+            <div className="lf-item-info">
+              <span className="lf-item-category">{item.category}</span>
+              <h3>{item.title}</h3>
+              <p><MapPin size={14} /> {item.location}, {item.campus}</p>
+              <p><CalendarDays size={14} /> {item.date}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      {filtered.length === 0 && (
+        <p className="lf-empty">No matching items found.</p>
+      )}
     </main>
   );
 }

@@ -1,387 +1,337 @@
-
-import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import {
-  LayoutGrid,
-  PlusCircle,
-  ImagePlus,
-  X
-} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ImagePlus, MapPin, Mail, X, Plus } from "lucide-react";
+import LostFoundHeader from "../components/LostFoundHeader";
+import { useAuth } from "../context/AuthContext";
+import "../styles/lost-found-pages.css";
 
 export default function CreateLostFound() {
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
+  const { user } = useAuth();
+  const inputRef = useRef(null);
+  const photosRef = useRef([]);
 
   const [form, setForm] = useState({
-    type: "Lost",
+    type: "Found",
     title: "",
     category: "",
-    description: "",
-    campus: "",
-    location: "",
     date: "",
-    contact: "",
-    agreed: false
+    campus: "Talamban Campus",
+    location: "",
+    description: "",
+    name: user?.name || "",
+    email: user?.email || "",
+    agree: false
   });
 
   const [photos, setPhotos] = useState([]);
-  const [dragging, setDragging] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    return () => {
-      photos.forEach((photo) => URL.revokeObjectURL(photo.preview));
-    };
+    photosRef.current = photos;
   }, [photos]);
 
-  function updateForm(e) {
-    const { name, value, type, checked } = e.target;
+  useEffect(() => {
+    return () => {
+      photosRef.current.forEach((photo) => URL.revokeObjectURL(photo.preview));
+    };
+  }, []);
 
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value
-    }));
-  }
+  const update = (field, value) => {
+    setForm((previous) => ({ ...previous, [field]: value }));
+  };
 
-  function addPhotos(files) {
-    const selected = Array.from(files);
+  const addPhotos = (files) => {
     const remaining = 5 - photos.length;
+    const valid = Array.from(files)
+      .filter((file) => ["image/jpeg", "image/png"].includes(file.type))
+      .filter((file) => file.size <= 5 * 1024 * 1024)
+      .slice(0, remaining);
 
-    if (selected.length > remaining) {
-      setError("You can upload a maximum of 5 photos.");
-      return;
-    }
+    setPhotos((previous) => [
+      ...previous,
+      ...valid.map((file) => ({
+        id: crypto.randomUUID(),
+        file,
+        preview: URL.createObjectURL(file)
+      }))
+    ]);
+  };
 
-    if (
-      selected.some(
-        (file) =>
-          !["image/jpeg", "image/png"].includes(file.type) ||
-          file.size > 5 * 1024 * 1024
-      )
-    ) {
-      setError("Only JPG or PNG images up to 5 MB are allowed.");
-      return;
-    }
+  const removePhoto = (id) => {
+    setPhotos((previous) => {
+      const target = previous.find((photo) => photo.id === id);
+      if (target) URL.revokeObjectURL(target.preview);
+      return previous.filter((photo) => photo.id !== id);
+    });
+  };
 
+  const publish = (event) => {
+    event.preventDefault();
     setError("");
 
-    const newPhotos = selected.map((file) => ({
-      id: crypto.randomUUID(),
-      file,
-      preview: URL.createObjectURL(file)
-    }));
-
-    setPhotos((prev) => [...prev, ...newPhotos]);
-  }
-
-  function removePhoto(id) {
-    setPhotos((prev) => prev.filter((photo) => photo.id !== id));
-  }
-
-  function handleDrop(e) {
-    e.preventDefault();
-    setDragging(false);
-    addPhotos(e.dataTransfer.files);
-  }
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    setError("");
-
-    if (!form.agreed) {
-      setError("Please confirm that your report details are accurate.");
+    if (!form.title.trim() || !form.category || !form.date ||
+        !form.location.trim() || !form.description.trim() ||
+        !form.name.trim() || !form.email.trim()) {
+      setError("Please complete all required fields.");
       return;
     }
 
-    alert("Report validated! Backend submission is not yet connected.");
-  }
+    if (!form.agree) {
+      setError("Please confirm that the information is accurate.");
+      return;
+    }
+
+    setError("Post publishing will be available after the database is connected.");
+  };
 
   return (
-    <main className="create-listing-page">
-      <div className="create-hero">
-        <h1>
-          Lost something on campus? <span>We'll help you find it.</span>
-        </h1>
+    <main className="lf-page">
+      <LostFoundHeader />
 
-        <div className="marketplace-switch">
-          <Link to="/lost-and-found">
-            <LayoutGrid size={15} />
-            View Reports
-          </Link>
-
-          <Link to="/lost-and-found/create" className="selected">
-            <PlusCircle size={15} />
-            Create Post
-          </Link>
-        </div>
-      </div>
-
-      <div className="create-heading">
+      <div className="lf-section-heading">
         <div>
-          <h2>Create Lost & Found Post</h2>
-          <p>
-            Report a lost item or help reunite someone with their belongings.
-          </p>
+          <h2>Make Post</h2>
+          <p>Lost it or found it? Help a fellow Carolinian bring it home.</p>
         </div>
         <span>* Required fields</span>
       </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="create-layout">
-          <div className="create-main-card">
+      <form onSubmit={publish}>
+        <div className="lf-create-layout">
+          <div className="lf-panel">
             <h3>Tell us about the item</h3>
-            <p className="section-description">
-              Provide clear details to help others recognize the item.
+            <p className="lf-panel-subtitle">
+              Share enough to help, but keep unique identifying details private.
             </p>
 
-            <div className="form-field">
-              <label htmlFor="type">Report type *</label>
-              <select
-                id="type"
-                name="type"
-                value={form.type}
-                onChange={updateForm}
-                required
-              >
-                <option value="Lost">Lost Item</option>
-                <option value="Found">Found Item</option>
-              </select>
-            </div>
-
-            <div className="form-field">
-              <label htmlFor="title">Item name *</label>
-              <input
-                id="title"
-                name="title"
-                required
-                maxLength={120}
-                placeholder="e.g. Black Leather Wallet"
-                value={form.title}
-                onChange={updateForm}
-              />
-            </div>
-
-            <div className="form-field">
-              <label htmlFor="category">Category *</label>
-              <select
-                id="category"
-                name="category"
-                required
-                value={form.category}
-                onChange={updateForm}
-              >
-                <option value="">Select a category</option>
-                <option value="Electronics">Electronics</option>
-                <option value="Personal IDs">Personal IDs</option>
-                <option value="Audio">Audio</option>
-                <option value="Daily Essentials">Daily Essentials</option>
-                <option value="Keys & Access">Keys & Access</option>
-                <option value="Accessories">Accessories</option>
-                <option value="Apparel">Apparel</option>
-                <option value="Others">Others</option>
-              </select>
-            </div>
-
-            <div className="form-field">
-              <label htmlFor="description">Description *</label>
-              <textarea
-                id="description"
-                name="description"
-                rows="5"
-                required
-                maxLength={1000}
-                placeholder="Describe the item's appearance, color, brand, and any identifying features."
-                value={form.description}
-                onChange={updateForm}
-              />
-              <span className="character-count">
-                {form.description.length} / 1000
-              </span>
-            </div>
-
-            <div className="form-divider" />
-
-            <h3>
-              {form.type === "Lost" ? "Last seen details" : "Found item details"}
-            </h3>
-            <p className="section-description">
-              {form.type === "Lost"
-                ? "Help others know where and when you last saw the item."
-                : "Let others know where and when the item was found."}
-            </p>
-
-            <div className="form-row">
-              <div className="form-field">
-                <label htmlFor="campus">Campus *</label>
-                <select
-                  id="campus"
-                  name="campus"
-                  required
-                  value={form.campus}
-                  onChange={updateForm}
+            <label className="lf-label">Report type *</label>
+            <div className="lf-type-grid">
+              {["Lost", "Found"].map((type) => (
+                <button
+                  type="button"
+                  key={type}
+                  className={`lf-type-option ${form.type === type ? "selected" : ""}`}
+                  onClick={() => update("type", type)}
                 >
-                  <option value="">Select campus</option>
-                  <option value="Talamban Campus">Talamban Campus</option>
-                  <option value="Downtown Campus">Downtown Campus</option>
+                  <span className="lf-radio-indicator" />
+                  <span>
+                    <strong>{type}</strong>
+                    <small>
+                      {type === "Lost"
+                        ? "I'm looking for my item"
+                        : "I found someone's item"}
+                    </small>
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <div className="lf-field">
+              <label htmlFor="lf-title">Item name *</label>
+              <input
+                id="lf-title"
+                value={form.title}
+                onChange={(e) => update("title", e.target.value)}
+                placeholder="e.g. Hydro Flask (Yellow)"
+                required
+              />
+            </div>
+
+            <div className="lf-field-grid">
+              <div className="lf-field">
+                <label htmlFor="lf-category">Category *</label>
+                <select
+                  id="lf-category"
+                  value={form.category}
+                  onChange={(e) => update("category", e.target.value)}
+                  required
+                >
+                  <option value="">Select category</option>
+                  <option>Daily Essentials</option>
+                  <option>Personal IDs</option>
+                  <option>Electronics</option>
+                  <option>Accessories</option>
+                  <option>Keys & Access</option>
+                  <option>Apparel</option>
+                  <option>Others</option>
                 </select>
               </div>
 
-              <div className="form-field">
-                <label htmlFor="location">
-                  {form.type === "Lost"
-                    ? "Last seen location *"
-                    : "Found location *"}
+              <div className="lf-field">
+                <label htmlFor="lf-date">
+                  Date {form.type === "Found" ? "found" : "lost"} *
                 </label>
                 <input
-                  id="location"
-                  name="location"
+                  id="lf-date"
+                  type="date"
+                  max={new Date().toLocaleDateString("en-CA")}
+                  value={form.date}
+                  onChange={(e) => update("date", e.target.value)}
                   required
-                  placeholder="e.g. Bunzel Lobby"
-                  value={form.location}
-                  onChange={updateForm}
                 />
+              </div>
+
+              <div className="lf-field">
+                <label htmlFor="lf-campus">Campus *</label>
+                <select
+                  id="lf-campus"
+                  value={form.campus}
+                  onChange={(e) => update("campus", e.target.value)}
+                >
+                  <option>Talamban Campus</option>
+                  <option>Downtown Campus</option>
+                </select>
+              </div>
+
+              <div className="lf-field">
+                <label htmlFor="lf-location">
+                  Location {form.type === "Found" ? "found" : "last seen"} *
+                </label>
+                <div className="lf-input-icon">
+                  <input
+                    id="lf-location"
+                    value={form.location}
+                    onChange={(e) => update("location", e.target.value)}
+                    placeholder="e.g. Basketball Court"
+                    required
+                  />
+                  <MapPin size={15} />
+                </div>
               </div>
             </div>
 
-            <div className="form-row">
-              <div className="form-field">
-                <label htmlFor="date">
-                  {form.type === "Lost" ? "Date lost *" : "Date found *"}
-                </label>
+            <div className="lf-field">
+              <label htmlFor="lf-description">Description *</label>
+              <textarea
+                id="lf-description"
+                rows={4}
+                maxLength={1000}
+                value={form.description}
+                onChange={(e) => update("description", e.target.value)}
+                placeholder="Describe the item and where it was lost or found..."
+                required
+              />
+            </div>
+
+            <div className="lf-form-divider" />
+
+            <h3>Contact & recovery</h3>
+            <p className="lf-panel-subtitle">
+              Your contact details are shared privately to help arrange a safe return.
+            </p>
+
+            <div className="lf-field-grid">
+              <div className="lf-field">
+                <label htmlFor="lf-name">Your name *</label>
                 <input
-                  id="date"
-                  name="date"
-                  type="date"
+                  id="lf-name"
+                  value={form.name}
+                  onChange={(e) => update("name", e.target.value)}
+                  placeholder="Full name"
                   required
-                  max={new Date().toLocaleDateString("en-CA")}
-                  value={form.date}
-                  onChange={updateForm}
                 />
               </div>
 
-              <div className="form-field">
-                <label htmlFor="contact">Contact details *</label>
-                <input
-                  id="contact"
-                  name="contact"
-                  required
-                  placeholder="USC email or preferred contact method"
-                  value={form.contact}
-                  onChange={updateForm}
-                />
+              <div className="lf-field">
+                <label htmlFor="lf-email">USC email *</label>
+                <div className="lf-input-icon">
+                  <input
+                    id="lf-email"
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => update("email", e.target.value)}
+                    placeholder="name@usc.edu.ph"
+                    required
+                  />
+                  <Mail size={15} />
+                </div>
               </div>
             </div>
           </div>
 
-          <aside className="create-sidebar">
-            <div className="create-photo-card">
-              <h3>Add photos</h3>
-              <p className="section-description">
-                Upload photos that can help identify the item.
-              </p>
+          <aside className="lf-panel lf-photo-panel">
+            <h3>Add photos</h3>
+            <p className="lf-panel-subtitle">A clear photo makes a match easier.</p>
 
-              <div
-                className={`upload-area ${dragging ? "dragging" : ""}`}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragging(true);
-                }}
-                onDragLeave={() => setDragging(false)}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    fileInputRef.current?.click();
-                  }
-                }}
-              >
-                <div className="upload-icon">
-                  <ImagePlus size={23} />
+            <input
+              ref={inputRef}
+              type="file"
+              accept="image/png,image/jpeg"
+              multiple
+              hidden
+              onChange={(event) => {
+                addPhotos(event.target.files);
+                event.target.value = "";
+              }}
+            />
+
+            <button
+              type="button"
+              className="lf-upload-area"
+              onClick={() => inputRef.current?.click()}
+              onDragOver={(event) => event.preventDefault()}
+              onDrop={(event) => {
+                event.preventDefault();
+                addPhotos(event.dataTransfer.files);
+              }}
+            >
+              <ImagePlus size={23} />
+              <strong>Drag photos here or browse files</strong>
+              <span>JPG or PNG · Up to 5 MB each</span>
+            </button>
+
+            <div className="lf-photo-list">
+              {photos.map((photo, index) => (
+                <div className="lf-photo-entry" key={photo.id}>
+                  <img src={photo.preview} alt={photo.file.name} />
+                  <div>
+                    <strong>{photo.file.name}</strong>
+                    <span>{index === 0 ? "Cover photo" : "Additional photo"}</span>
+                    <button type="button" onClick={() => removePhoto(photo.id)}>
+                      Remove
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    className="lf-remove-photo"
+                    onClick={() => removePhoto(photo.id)}
+                    aria-label="Remove photo"
+                  >
+                    <X size={15} />
+                  </button>
                 </div>
-                <strong>Drag photos here or browse files</strong>
-                <span>JPG or PNG · Up to 5 MB each</span>
-              </div>
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/png"
-                multiple
-                hidden
-                onChange={(e) => {
-                  addPhotos(e.target.files);
-                  e.target.value = "";
-                }}
-              />
-
-              {photos.length > 0 && (
-                <div className="photo-preview-grid">
-                  {photos.map((photo, index) => (
-                    <div className="photo-preview" key={photo.id}>
-                      <img
-                        src={photo.preview}
-                        alt={`Upload ${index + 1}`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removePhoto(photo.id)}
-                        aria-label="Remove photo"
-                      >
-                        <X size={13} />
-                      </button>
-                      {index === 0 && (
-                        <span className="cover-label">Cover</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <div className="photo-footer">
-                <span>{photos.length} / 5 photos added</span>
-                <span>First photo is the cover</span>
-              </div>
+              ))}
             </div>
+
+            <p className="lf-photo-count">
+              {photos.length}/5 photos added · Photos are optional
+            </p>
           </aside>
         </div>
 
-        <div className="create-bottom-bar">
-          <label className="checkbox-label">
+        <div className="lf-publish-bar">
+          <label>
             <input
               type="checkbox"
-              name="agreed"
-              checked={form.agreed}
-              onChange={updateForm}
+              checked={form.agree}
+              onChange={(e) => update("agree", e.target.checked)}
             />
-            <span>
-              I confirm that the information in this report is accurate.
-            </span>
+            I confirm these details are accurate and respect the owner's privacy.
           </label>
 
-          <div className="create-actions">
-            <button
-              type="button"
-              className="cancel-listing-btn"
-              onClick={() => navigate("/lost-and-found")}
-            >
+          <div className="lf-publish-actions">
+            <button type="button" className="lf-cancel" onClick={() => navigate("/lost-and-found")}>
               Cancel
             </button>
-
-            <button type="submit" className="publish-listing-btn">
-              <PlusCircle size={16} />
+            <button type="submit" className="lf-primary-button">
+              <Plus size={16} />
               Publish Post
             </button>
           </div>
         </div>
 
-        {error && (
-          <p className="create-form-error" role="alert">
-            {error}
-          </p>
-        )}
+        {error && <p className="lf-form-error" role="alert">{error}</p>}
       </form>
     </main>
   );

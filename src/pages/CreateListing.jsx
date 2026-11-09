@@ -1,137 +1,151 @@
 
-import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import {
-  LayoutGrid,
-  PlusCircle,
-  ImagePlus,
-  X
-} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ImagePlus, X, Plus } from "lucide-react";
+import MarketplaceHeader from "../components/MarketplaceHeader";
+
+const categories = [
+  "Textbooks",
+  "Electronics",
+  "Supplies",
+  "Clothing",
+  "Accessories",
+  "Others"
+];
+
+const conditions = [
+  "New",
+  "Like New",
+  "Good",
+  "Fair",
+  "Used"
+];
 
 export default function CreateListing() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const photosRef = useRef([]);
 
   const [form, setForm] = useState({
     title: "",
     category: "",
     condition: "",
     price: "",
-    negotiable: false,
     description: "",
     campus: "",
-    location: "",
-    contact: "",
-    agreed: false
+    agree: false
   });
 
   const [photos, setPhotos] = useState([]);
-  const [dragging, setDragging] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    return () => {
-      photos.forEach((photo) =>
-        URL.revokeObjectURL(photo.preview)
-      );
-    };
+    photosRef.current = photos;
   }, [photos]);
 
-  function updateForm(e) {
-    const { name, value, type, checked } = e.target;
+  useEffect(() => {
+    return () => {
+      photosRef.current.forEach((photo) => {
+        URL.revokeObjectURL(photo.preview);
+      });
+    };
+  }, []);
 
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value
+  const updateField = (field, value) => {
+    setForm((previous) => ({
+      ...previous,
+      [field]: value
     }));
-  }
+  };
 
-  function addPhotos(files) {
-    const selected = Array.from(files);
+  const addPhotos = (files) => {
     const remaining = 5 - photos.length;
 
-    if (selected.length > remaining) {
-      setError("You can upload a maximum of 5 photos.");
+    if (remaining <= 0) {
+      setError("You can only upload up to 5 photos.");
       return;
     }
 
-    if (
-      selected.some(
-        (file) =>
-          !["image/jpeg", "image/png"].includes(file.type) ||
-          file.size > 5 * 1024 * 1024
-      )
-    ) {
-      setError("Only JPG or PNG images up to 5 MB are allowed.");
+    const validFiles = Array.from(files)
+      .filter((file) => {
+        return (
+          ["image/jpeg", "image/png"].includes(file.type) &&
+          file.size <= 5 * 1024 * 1024
+        );
+      })
+      .slice(0, remaining);
+
+    if (validFiles.length === 0) {
+      setError("Please upload JPG or PNG images under 5 MB.");
       return;
     }
 
-    setError("");
-
-    const newPhotos = selected.map((file) => ({
+    const newPhotos = validFiles.map((file) => ({
       id: crypto.randomUUID(),
       file,
       preview: URL.createObjectURL(file)
     }));
 
-    setPhotos((prev) => [...prev, ...newPhotos]);
-  }
+    setPhotos((previous) => [...previous, ...newPhotos]);
+    setError("");
+  };
 
-  function removePhoto(id) {
-    setPhotos((prev) => prev.filter((p) => p.id !== id));
-  }
+  const removePhoto = (id) => {
+    const target = photos.find((photo) => photo.id === id);
 
-  function handleDrop(e) {
-    e.preventDefault();
-    setDragging(false);
-    addPhotos(e.dataTransfer.files);
-  }
+    if (target) {
+      URL.revokeObjectURL(target.preview);
+    }
 
-  function handleSubmit(e) {
-    e.preventDefault();
+    setPhotos((previous) =>
+      previous.filter((photo) => photo.id !== id)
+    );
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
     setError("");
 
-    if (!form.agreed) {
-      setError("Please agree to the marketplace guidelines.");
+    if (
+      !form.title.trim() ||
+      !form.category ||
+      !form.condition ||
+      !form.price ||
+      !form.description.trim() ||
+      !form.campus
+    ) {
+      setError("Please complete all required fields.");
       return;
     }
 
-    if (photos.length === 0) {
-      setError("Please add at least one item photo.");
+    if (Number(form.price) <= 0) {
+      setError("Please enter a valid price.");
       return;
     }
 
-    alert("Listing form validated! Backend submission is not yet connected.");
-  }
+    if (!form.agree) {
+      setError("Please confirm that your listing details are accurate.");
+      return;
+    }
+
+    setError(
+      "Listing publishing will be available after the database is connected."
+    );
+  };
 
   return (
     <main className="create-listing-page">
-      <div className="create-hero">
-        <h1>
-          Buy & Sell <span>Academic Essentials.</span>
-        </h1>
-
-        <div className="marketplace-switch">
-          <Link to="/marketplace">
-            <LayoutGrid size={15} />
-            View Listings
-          </Link>
-
-          <Link to="/marketplace/create" className="selected">
-            <PlusCircle size={15} />
-            Create Listing
-          </Link>
-        </div>
-      </div>
+      <MarketplaceHeader />
 
       <div className="create-heading">
         <div>
           <h2>Create Listing</h2>
           <p>
-            Turn what you no longer need into another
-            Carolinian's next essential.
+            Turn what you no longer need into another Carolinian's
+            next essential.
           </p>
         </div>
+
         <span>* Required fields</span>
       </div>
 
@@ -139,242 +153,247 @@ export default function CreateListing() {
         <div className="create-layout">
           <div className="create-main-card">
             <h3>Tell us about your item</h3>
-            <p className="section-description">
+
+            <p className="create-section-subtitle">
               A clear title and honest details help students find
               the right fit.
             </p>
 
-            <div className="form-field">
-              <label htmlFor="title">Listing title *</label>
+            <div className="create-field">
+              <label htmlFor="listing-title">
+                Listing title *
+              </label>
+
               <input
-                id="title"
-                name="title"
-                required
-                maxLength={120}
+                id="listing-title"
+                type="text"
                 placeholder="e.g. Organic Chemistry (Wade, 8th Ed)"
                 value={form.title}
-                onChange={updateForm}
+                onChange={(event) =>
+                  updateField("title", event.target.value)
+                }
+                required
               />
             </div>
 
-            <div className="form-row">
-              <div className="form-field">
-                <label htmlFor="category">Category *</label>
+            <div className="create-form-row">
+              <div className="create-field">
+                <label htmlFor="listing-category">
+                  Category *
+                </label>
+
                 <select
-                  id="category"
-                  name="category"
-                  required
+                  id="listing-category"
                   value={form.category}
-                  onChange={updateForm}
+                  onChange={(event) =>
+                    updateField("category", event.target.value)
+                  }
+                  required
                 >
                   <option value="">Select a category</option>
-                  <option value="Textbooks">Textbooks</option>
-                  <option value="Electronics">Electronics</option>
-                  <option value="Supplies">Supplies</option>
+
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
                 </select>
               </div>
 
-              <div className="form-field">
-                <label htmlFor="condition">Condition *</label>
+              <div className="create-field">
+                <label htmlFor="listing-condition">
+                  Condition *
+                </label>
+
                 <select
-                  id="condition"
-                  name="condition"
-                  required
+                  id="listing-condition"
                   value={form.condition}
-                  onChange={updateForm}
+                  onChange={(event) =>
+                    updateField("condition", event.target.value)
+                  }
+                  required
                 >
                   <option value="">Select item condition</option>
-                  <option value="New">New</option>
-                  <option value="Like New">Like New</option>
-                  <option value="Used">Used</option>
+
+                  {conditions.map((condition) => (
+                    <option key={condition} value={condition}>
+                      {condition}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
 
-            <div className="form-row price-row">
-              <div className="form-field">
-                <label htmlFor="price">Price (PHP) *</label>
-                <input
-                  id="price"
-                  name="price"
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  required
-                  placeholder="₱ 0.00"
-                  value={form.price}
-                  onChange={updateForm}
-                />
-              </div>
-
-              <label className="checkbox-label negotiable">
-                <input
-                  type="checkbox"
-                  name="negotiable"
-                  checked={form.negotiable}
-                  onChange={updateForm}
-                />
-                Price is negotiable
+            <div className="create-field">
+              <label htmlFor="listing-price">
+                Price (PHP) *
               </label>
+
+              <input
+                id="listing-price"
+                type="number"
+                min="1"
+                step="0.01"
+                placeholder="₱ 0.00"
+                value={form.price}
+                onChange={(event) =>
+                  updateField("price", event.target.value)
+                }
+                required
+              />
             </div>
 
-            <div className="form-field">
-              <label htmlFor="description">Description *</label>
+            <div className="create-field">
+              <label htmlFor="listing-description">
+                Description *
+              </label>
+
               <textarea
-                id="description"
-                name="description"
-                rows="5"
-                required
+                id="listing-description"
+                rows={5}
                 maxLength={1000}
                 placeholder="Describe the item's condition, edition or size, what's included, and any signs of wear."
                 value={form.description}
-                onChange={updateForm}
+                onChange={(event) =>
+                  updateField("description", event.target.value)
+                }
+                required
               />
-              <span className="character-count">
+
+              <div className="create-character-count">
                 {form.description.length} / 1000
-              </span>
+              </div>
             </div>
 
-            <div className="form-divider" />
+            <div className="create-form-divider" />
 
             <h3>Meet-up & contact</h3>
-            <p className="section-description">
+
+            <p className="create-section-subtitle">
               Keep exchanges convenient and within the USC community.
             </p>
 
-            <div className="form-row">
-              <div className="form-field">
-                <label htmlFor="campus">Campus *</label>
-                <select
-                  id="campus"
-                  name="campus"
-                  required
-                  value={form.campus}
-                  onChange={updateForm}
-                >
-                  <option value="">Select campus</option>
-                  <option value="Talamban Campus">
-                    Talamban Campus
-                  </option>
-                  <option value="Downtown Campus">
-                    Downtown Campus
-                  </option>
-                </select>
-              </div>
+            <div className="create-field">
+              <label htmlFor="listing-campus">
+                Campus *
+              </label>
 
-              <div className="form-field">
-                <label htmlFor="location">Meet-up location *</label>
-                <input
-                  id="location"
-                  name="location"
-                  required
-                  placeholder="e.g. Library entrance"
-                  value={form.location}
-                  onChange={updateForm}
-                />
-              </div>
-            </div>
-
-            <div className="form-field">
-              <label htmlFor="contact">Contact details *</label>
-              <input
-                id="contact"
-                name="contact"
+              <select
+                id="listing-campus"
+                value={form.campus}
+                onChange={(event) =>
+                  updateField("campus", event.target.value)
+                }
                 required
-                placeholder="USC email or preferred contact method"
-                value={form.contact}
-                onChange={updateForm}
-              />
+              >
+                <option value="">Select campus</option>
+                <option value="Talamban Campus">
+                  Talamban Campus
+                </option>
+                <option value="Downtown Campus">
+                  Downtown Campus
+                </option>
+              </select>
             </div>
           </div>
 
-            <aside className="create-sidebar">
+          <aside className="create-sidebar">
             <div className="create-photo-card">
-                <h3>Add photos</h3>
-                <p className="section-description">
+              <h3>Add photos</h3>
+
+              <p className="create-section-subtitle">
                 Show your item from its best angles.
-                </p>
+              </p>
 
-                <div
-                className={`upload-area ${dragging ? "dragging" : ""}`}
-                onDragOver={(e) => {
-                    e.preventDefault();
-                    setDragging(true);
-                }}
-                onDragLeave={() => setDragging(false)}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    fileInputRef.current?.click();
-                    }
-                }}
-                >
-                <div className="upload-icon">
-                    <ImagePlus size={23} />
-                </div>
-                <strong>Drag photos here or browse files</strong>
-                <span>JPG or PNG · Up to 5 MB each</span>
-                </div>
-
-                <input
+              <input
                 ref={fileInputRef}
                 type="file"
                 accept="image/jpeg,image/png"
                 multiple
                 hidden
-                onChange={(e) => {
-                    addPhotos(e.target.files);
-                    e.target.value = "";
+                onChange={(event) => {
+                  addPhotos(event.target.files);
+                  event.target.value = "";
                 }}
-                />
+              />
 
-                {photos.length > 0 && (
-                <div className="photo-preview-grid">
-                    {photos.map((photo, index) => (
-                    <div className="photo-preview" key={photo.id}>
-                        <img
+              <button
+                type="button"
+                className="upload-area"
+                onClick={() => fileInputRef.current?.click()}
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  addPhotos(event.dataTransfer.files);
+                }}
+              >
+                <ImagePlus size={24} />
+
+                <strong>
+                  Drag photos here or browse files
+                </strong>
+
+                <span>
+                  JPG or PNG · Up to 5 MB each
+                </span>
+              </button>
+
+              {photos.length > 0 && (
+                <div className="create-photo-preview-list">
+                  {photos.map((photo, index) => (
+                    <div
+                      className="create-photo-preview"
+                      key={photo.id}
+                    >
+                      <img
                         src={photo.preview}
-                        alt={`Upload ${index + 1}`}
-                        />
-                        <button
+                        alt={photo.file.name}
+                      />
+
+                      <div className="create-photo-details">
+                        <strong>{photo.file.name}</strong>
+
+                        <span>
+                          {index === 0
+                            ? "Cover photo"
+                            : "Additional photo"}
+                        </span>
+                      </div>
+
+                      <button
                         type="button"
+                        className="create-remove-photo"
                         onClick={() => removePhoto(photo.id)}
                         aria-label="Remove photo"
-                        >
-                        <X size={13} />
-                        </button>
-                        {index === 0 && (
-                        <span className="cover-label">Cover</span>
-                        )}
+                      >
+                        <X size={16} />
+                      </button>
                     </div>
-                    ))}
+                  ))}
                 </div>
-                )}
+              )}
 
-                <div className="photo-footer">
+              <div className="create-photo-footer">
                 <span>{photos.length} / 5 photos added</span>
                 <span>First photo is the cover</span>
-                </div>
+              </div>
             </div>
-            </aside>
-
+          </aside>
         </div>
 
         <div className="create-bottom-bar">
-          <label className="checkbox-label">
+          <label className="create-agreement">
             <input
               type="checkbox"
-              name="agreed"
-              checked={form.agreed}
-              onChange={updateForm}
+              checked={form.agree}
+              onChange={(event) =>
+                updateField("agree", event.target.checked)
+              }
             />
+
             <span>
-              I confirm my item details are accurate and agree to
-              the <a href="#guidelines">marketplace guidelines</a>.
+              I confirm my item details are accurate and agree
+              to the marketplace guidelines.
             </span>
           </label>
 
@@ -386,15 +405,21 @@ export default function CreateListing() {
             >
               Cancel
             </button>
-            <button type="submit" className="publish-listing-btn">
-              <PlusCircle size={16} />
+
+            <button
+              type="submit"
+              className="publish-listing-btn"
+            >
+              <Plus size={16} />
               Publish Listing
             </button>
           </div>
         </div>
 
         {error && (
-          <p className="create-form-error" role="alert">{error}</p>
+          <p className="create-error" role="alert">
+            {error}
+          </p>
         )}
       </form>
     </main>

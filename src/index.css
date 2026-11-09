@@ -1,5 +1,4 @@
-
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap");
 
 * {
   box-sizing: border-box;
@@ -34,6 +33,11 @@ button {
   flex-direction: column;
 }
 
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
 .navbar {
   height: 72px;
   padding: 0 4.2%;
@@ -54,12 +58,8 @@ button {
 .logo-icon {
   width: 34px;
   height: 34px;
-  background: #006b22;
-  color: #ffcf36;
   border-radius: 8px;
-  display: grid;
-  place-items: center;
-  font-size: 28px;
+  object-fit: contain;
 }
 
 .logo strong {
@@ -109,12 +109,46 @@ button {
   padding: 10px 20px;
 }
 
-.add-btn {
+.nav-actions .login-btn,
+.nav-actions .signup-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  font-size: 12px;
+}
+
+.navbar .logo,
+.navbar .logo:visited {
+  color: inherit;
+  text-decoration: none;
+}
+
+.navbar .logo strong {
+  color: #191919;
+}
+
+.navbar .logo small {
+  color: #777;
+}
+
+.navbar .nav-actions a,
+.navbar .nav-actions a:visited {
+  text-decoration: none;
+}
+
+.navbar .login-btn,
+.navbar .login-btn:visited {
+  color: #006b22;
+}
+
+.navbar .signup-btn,
+.navbar .signup-btn:visited {
+  color: #fff;
+}
+
+.navbar .logo:hover,
+.navbar .nav-actions a:hover {
+  text-decoration: none;
 }
 
 .marketplace {
@@ -314,42 +348,6 @@ button {
   color: #777;
 }
 
-.footer {
-  margin-top: auto;
-  border-top: 1px solid #eee;
-  background: white;
-  padding: 24px 4.2%;
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  color: #888;
-  font-size: 11px;
-}
-
-.create-listing-page {
-  flex: 1;
-  width: 100%;
-  max-width: 1350px;
-  margin: 0 auto;
-  padding: 25px 35px 35px;
-}
-
-.create-hero {
-  text-align: center;
-  margin-bottom: 28px;
-}
-
-.create-hero h1 {
-  font-size: clamp(26px, 3vw, 36px);
-  font-weight: 800;
-  margin: 0 0 18px;
-  letter-spacing: -0.8px;
-}
-
-.create-hero h1 span {
-  color: #006b22;
-}
-
 .marketplace-switch {
   display: inline-flex;
   background: white;
@@ -376,6 +374,50 @@ button {
 .marketplace-switch a.selected {
   background: #006b22;
   color: white;
+}
+
+.marketplace-hero {
+  padding: 0 0 28px;
+}
+
+.marketplace-hero h1 {
+  margin: 0 0 18px;
+}
+
+.marketplace-hero .marketplace-switch {
+  margin-bottom: 22px;
+}
+
+.marketplace-hero .search-bar {
+  max-width: 760px;
+}
+
+.marketplace-hero + .listings-header {
+  margin-top: 0;
+}
+
+.create-listing-page {
+  flex: 1;
+  width: 100%;
+  max-width: 1350px;
+  margin: 0 auto;
+  padding: 25px 35px 35px;
+}
+
+.create-hero {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.create-hero h1 {
+  font-size: clamp(26px, 3vw, 36px);
+  font-weight: 800;
+  margin: 0 0 18px;
+  letter-spacing: -0.8px;
+}
+
+.create-hero h1 span {
+  color: #006b22;
 }
 
 .create-heading {
@@ -649,178 +691,190 @@ button {
   flex-shrink: 0;
 }
 
-.cancel-listing-btn {
-  background: white;
-  border: 1px solid #e5e3df;
-  border-radius: 25px;
-  padding: 10px 20px;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.publish-listing-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #006b22;
-  color: white;
-  border: none;
-  border-radius: 25px;
-  padding: 10px 20px;
-  font-size: 12px;
-  font-weight: 700;
-}
-
 .create-form-error {
   color: #b42318;
   font-size: 12px;
   margin-top: 12px;
 }
 
-@media (max-width: 900px) {
-  .marketplace {
-    padding: 28px 24px 50px;
-  }
-
-  .product-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
-  }
-
-  .nav-links {
-    gap: 12px;
-  }
-
-  .listings-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .create-listing-page {
-    padding: 25px 24px;
-  }
-
-  .create-layout {
-    grid-template-columns: 1fr;
-  }
+.create-listing-page .marketplace-header {
+  text-align: center;
+  margin-bottom: 30px;
 }
 
-@media (max-width: 600px) {
-  .navbar {
-    height: auto;
-    flex-wrap: wrap;
-    gap: 15px;
-    padding: 16px;
-  }
-
-  .nav-links {
-    order: 3;
-    width: 100%;
-    justify-content: space-between;
-    flex-wrap: wrap;
-  }
-
-  .marketplace {
-    padding: 20px 16px 40px;
-  }
-
-  .hero {
-    padding: 20px 0 35px;
-  }
-
-  .hero h1 {
-    font-size: 26px;
-  }
-
-  .search-bar {
-    flex-wrap: wrap;
-  }
-
-  .search-bar input {
-    flex-basis: 75%;
-  }
-
-  .search-bar select {
-    flex: 1;
-  }
-
-  .category-tabs {
-    flex-wrap: wrap;
-  }
-
-  .listing-title {
-    flex-wrap: wrap;
-    gap: 5px 12px;
-  }
-
-  .product-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-  }
-
-  .product-image {
-    height: 110px;
-  }
-
-  .product-info {
-    padding: 10px;
-  }
-
-  .product-info h3 {
-    font-size: 12px;
-  }
-
-  .product-meta strong {
-    font-size: 13px;
-  }
-
-  .footer {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .create-listing-page {
-    padding: 20px 16px 35px;
-  }
-
-  .create-hero h1 {
-    font-size: 25px;
-  }
-
-  .marketplace-switch a {
-    min-width: 0;
-    padding: 10px 13px;
-  }
-
-  .create-heading {
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .create-heading > span {
-    white-space: nowrap;
-  }
-
-  .create-main-card,
-  .create-photo-card {
-    padding: 16px;
-  }
-
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-
-  .create-bottom-bar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .create-actions {
-    justify-content: flex-end;
-  }
+.create-listing-page .marketplace-header h1 {
+  margin: 0 0 18px;
 }
 
+.create-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.create-field {
+  margin-bottom: 18px;
+}
+
+.create-field label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.create-field input,
+.create-field select,
+.create-field textarea {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #e8e5df;
+  border-radius: 8px;
+  background: white;
+  color: #242424;
+  font-family: inherit;
+  font-size: 12px;
+  outline: none;
+}
+
+.create-field input:focus,
+.create-field select:focus,
+.create-field textarea:focus {
+  border-color: #086322;
+}
+
+.create-field textarea {
+  resize: vertical;
+  min-height: 95px;
+  line-height: 1.6;
+}
+
+.create-character-count {
+  margin-top: 5px;
+  color: #999;
+  font-size: 11px;
+  text-align: right;
+}
+
+.create-form-divider {
+  height: 1px;
+  margin: 20px 0;
+  background: #eae7e2;
+}
+
+.create-photo-preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.create-photo-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.create-photo-preview img {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.create-photo-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.create-photo-details strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+.create-photo-details span {
+  display: block;
+  margin-top: 4px;
+  color: #086322;
+  font-size: 10px;
+}
+
+.create-remove-photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #888;
+  cursor: pointer;
+}
+
+.create-remove-photo:hover {
+  background: #fff0ee;
+  color: #b42318;
+}
+
+.create-photo-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 15px;
+  color: #999;
+  font-size: 11px;
+}
+
+.create-photo-footer span:last-child {
+  color: #086322;
+}
+
+.create-error {
+  margin-top: 12px;
+  color: #b42318;
+  font-size: 12px;
+}
+
+.create-agreement, .create-agreement label, .create-bottom-bar label, .checkbox-label {
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #333;
+}
+
+.create-agreement input[type="checkbox"], .create-bottom-bar input[type="checkbox"], .checkbox-label input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  accent-color: #006b22;
+}
+
+.create-agreement {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.create-agreement a, .create-bottom-bar a {
+  font: inherit;
+  font-weight: 700;
+  color: #006b22;
+}
+
+.create-section-subtitle {
+  font-size: 11px;
+  color: #888;
+  margin: 0 0 18px;
+  line-height: 1.5;
+}
+
+.create-main-card h3, .create-photo-card h3 {
+  font-family: inherit;
+}
 
 .lostfound-page {
   flex: 1;
@@ -1082,83 +1136,6 @@ button {
   font-size: 12px;
 }
 
-@media (max-width: 900px) {
-  .lostfound-page {
-    padding: 25px 24px 50px;
-  }
-
-  .lostfound-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
-  }
-
-  .lostfound-listings-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .lostfound-hero {
-    padding-bottom: 55px;
-  }
-}
-
-@media (max-width: 600px) {
-  .lostfound-page {
-    padding: 20px 16px 40px;
-  }
-
-  .lostfound-hero {
-    padding: 30px 0 40px;
-  }
-
-  .lostfound-hero h1 {
-    font-size: 26px;
-  }
-
-  .lostfound-search {
-    flex-wrap: wrap;
-  }
-
-  .lostfound-search input {
-    flex-basis: 75%;
-  }
-
-  .lostfound-search select {
-    flex: 1;
-  }
-
-  .lostfound-listing-title {
-    flex-wrap: wrap;
-    gap: 5px 12px;
-  }
-
-  .lostfound-filters {
-    flex-wrap: wrap;
-  }
-
-  .lostfound-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-  }
-
-  .lostfound-image {
-    height: 110px;
-  }
-
-  .lostfound-info {
-    padding: 10px;
-  }
-
-  .lostfound-info h3 {
-    font-size: 12px;
-  }
-
-  .lostfound-info p {
-    font-size: 10px;
-  }
-}
-
-
 .marketplace,
 .lostfound-page {
   flex: 1;
@@ -1379,100 +1356,6 @@ button {
   margin: 4px 0;
 }
 
-@media (max-width: 900px) {
-  .marketplace,
-  .lostfound-page {
-    padding: 25px 24px 50px;
-  }
-
-  .product-grid,
-  .lostfound-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
-  }
-
-  .listings-header,
-  .lostfound-listings-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .hero,
-  .lostfound-hero {
-    padding: 30px 0 50px;
-  }
-}
-
-@media (max-width: 600px) {
-  .marketplace,
-  .lostfound-page {
-    padding: 20px 16px 40px;
-  }
-
-  .hero,
-  .lostfound-hero {
-    padding: 25px 0 40px;
-  }
-
-  .hero h1,
-  .lostfound-hero h1 {
-    font-size: 26px;
-  }
-
-  .search-bar,
-  .lostfound-search {
-    flex-wrap: wrap;
-  }
-
-  .search-bar input,
-  .lostfound-search input {
-    flex-basis: 75%;
-  }
-
-  .search-bar select,
-  .lostfound-search select {
-    flex: 1;
-  }
-
-  .category-tabs,
-  .lostfound-filters {
-    flex-wrap: wrap;
-  }
-
-  .listing-title,
-  .lostfound-listing-title {
-    flex-wrap: wrap;
-    gap: 5px 12px;
-  }
-
-  .product-grid,
-  .lostfound-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-  }
-
-  .product-image,
-  .lostfound-image {
-    height: 110px;
-  }
-
-  .product-info,
-  .lostfound-info {
-    padding: 10px;
-  }
-
-  .product-info h3,
-  .lostfound-info h3 {
-    font-size: 12px;
-  }
-
-  .product-info p,
-  .lostfound-info p {
-    font-size: 10px;
-  }
-}
-
-
 .listing-page {
   flex: 1;
   width: 100%;
@@ -1630,7 +1513,130 @@ button {
   height: 145px;
 }
 
+.tambayan-page .listing-card {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tambayan-page .listing-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 20px rgba(0, 0, 0, 0.09);
+}
+
+.tambayan-page .listing-card:focus-visible {
+  outline: 2px solid #086322;
+  outline-offset: 3px;
+}
+
+.footer {
+  margin-top: auto;
+  border-top: 1px solid #eee;
+  background: white;
+  padding: 24px 4.2%;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  color: #888;
+  font-size: 11px;
+}
+
+.add-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.cancel-listing-btn {
+  background: white;
+  border: 1px solid #e5e3df;
+  border-radius: 25px;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.publish-listing-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #006b22;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 @media (max-width: 900px) {
+  .nav-links {
+    gap: 12px;
+  }
+
+  .marketplace {
+    padding: 28px 24px 50px;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .listings-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .create-listing-page {
+    padding: 25px 24px;
+  }
+
+  .create-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .lostfound-page {
+    padding: 25px 24px 50px;
+  }
+
+  .lostfound-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .lostfound-listings-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .lostfound-hero {
+    padding-bottom: 55px;
+  }
+
+  .marketplace,
+    .lostfound-page {
+    padding: 25px 24px 50px;
+  }
+
+  .product-grid,
+    .lostfound-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .listings-header,
+    .lostfound-listings-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero,
+    .lostfound-hero {
+    padding: 30px 0 50px;
+  }
+
   .listing-page {
     padding: 25px 24px 50px;
   }
@@ -1641,13 +1647,251 @@ button {
   }
 
   .listing-grid,
-  .listing-grid.three-columns {
+    .listing-grid.three-columns {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 18px;
   }
 }
 
 @media (max-width: 600px) {
+  .navbar {
+    height: auto;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 16px;
+  }
+
+  .nav-links {
+    order: 3;
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .marketplace {
+    padding: 20px 16px 40px;
+  }
+
+  .hero {
+    padding: 20px 0 35px;
+  }
+
+  .hero h1 {
+    font-size: 26px;
+  }
+
+  .search-bar {
+    flex-wrap: wrap;
+  }
+
+  .search-bar input {
+    flex-basis: 75%;
+  }
+
+  .search-bar select {
+    flex: 1;
+  }
+
+  .category-tabs {
+    flex-wrap: wrap;
+  }
+
+  .listing-title {
+    flex-wrap: wrap;
+    gap: 5px 12px;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .product-image {
+    height: 110px;
+  }
+
+  .product-info {
+    padding: 10px;
+  }
+
+  .product-info h3 {
+    font-size: 12px;
+  }
+
+  .product-meta strong {
+    font-size: 13px;
+  }
+
+  .marketplace-switch a {
+    min-width: 0;
+    padding: 10px 13px;
+  }
+
+  .marketplace-hero {
+    padding: 10px 0 30px;
+  }
+
+  .marketplace-hero .marketplace-switch {
+    margin-bottom: 20px;
+  }
+
+  .create-listing-page {
+    padding: 20px 16px 35px;
+  }
+
+  .create-hero h1 {
+    font-size: 25px;
+  }
+
+  .create-heading {
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .create-heading > span {
+    white-space: nowrap;
+  }
+
+  .create-main-card,
+    .create-photo-card {
+    padding: 16px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .create-bottom-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .create-actions {
+    justify-content: flex-end;
+  }
+
+  .lostfound-page {
+    padding: 20px 16px 40px;
+  }
+
+  .lostfound-hero {
+    padding: 30px 0 40px;
+  }
+
+  .lostfound-hero h1 {
+    font-size: 26px;
+  }
+
+  .lostfound-search {
+    flex-wrap: wrap;
+  }
+
+  .lostfound-search input {
+    flex-basis: 75%;
+  }
+
+  .lostfound-search select {
+    flex: 1;
+  }
+
+  .lostfound-listing-title {
+    flex-wrap: wrap;
+    gap: 5px 12px;
+  }
+
+  .lostfound-filters {
+    flex-wrap: wrap;
+  }
+
+  .lostfound-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .lostfound-image {
+    height: 110px;
+  }
+
+  .lostfound-info {
+    padding: 10px;
+  }
+
+  .lostfound-info h3 {
+    font-size: 12px;
+  }
+
+  .lostfound-info p {
+    font-size: 10px;
+  }
+
+  .marketplace,
+    .lostfound-page {
+    padding: 20px 16px 40px;
+  }
+
+  .hero,
+    .lostfound-hero {
+    padding: 25px 0 40px;
+  }
+
+  .hero h1,
+    .lostfound-hero h1 {
+    font-size: 26px;
+  }
+
+  .search-bar,
+    .lostfound-search {
+    flex-wrap: wrap;
+  }
+
+  .search-bar input,
+    .lostfound-search input {
+    flex-basis: 75%;
+  }
+
+  .search-bar select,
+    .lostfound-search select {
+    flex: 1;
+  }
+
+  .category-tabs,
+    .lostfound-filters {
+    flex-wrap: wrap;
+  }
+
+  .listing-title,
+    .lostfound-listing-title {
+    flex-wrap: wrap;
+    gap: 5px 12px;
+  }
+
+  .product-grid,
+    .lostfound-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .product-image,
+    .lostfound-image {
+    height: 110px;
+  }
+
+  .product-info,
+    .lostfound-info {
+    padding: 10px;
+  }
+
+  .product-info h3,
+    .lostfound-info h3 {
+    font-size: 12px;
+  }
+
+  .product-info p,
+    .lostfound-info p {
+    font-size: 10px;
+  }
+
   .listing-page {
     padding: 20px 16px 40px;
   }
@@ -1662,13 +1906,13 @@ button {
   }
 
   .listing-grid,
-  .listing-grid.three-columns {
+    .listing-grid.three-columns {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
   }
 
   .listing-image,
-  .tambayan-page .listing-image {
+    .tambayan-page .listing-image {
     height: 110px;
   }
 
@@ -1683,35 +1927,19 @@ button {
   .listing-detail {
     font-size: 10px;
   }
+
+  .footer {
+    flex-direction: column;
+    gap: 12px;
+  }
 }
 
-
-.marketplace-hero {
-  padding: 0 0 28px;
-}
-
-.marketplace-hero h1 {
-  margin: 0 0 18px;
-}
-
-.marketplace-hero .marketplace-switch {
-  margin-bottom: 22px;
-}
-
-.marketplace-hero .search-bar {
-  max-width: 760px;
-}
-
-.marketplace-hero + .listings-header {
-  margin-top: 0;
-}
-
-@media (max-width: 600px) {
-  .marketplace-hero {
-    padding: 10px 0 30px;
+@media (max-width: 650px) {
+  .create-form-row {
+    grid-template-columns: 1fr;
   }
 
-  .marketplace-hero .marketplace-switch {
-    margin-bottom: 20px;
+  .create-photo-footer {
+    flex-wrap: wrap;
   }
 }

@@ -1,8 +1,9 @@
 
 import { useState } from "react";
+import { Search } from "lucide-react";
 import ProductCard from "../components/ProductCard";
-import { Link } from "react-router-dom";
-import { LayoutGrid, PlusCircle, Search } from "lucide-react";
+import MarketplaceHeader from "../components/MarketplaceHeader";
+import { imagePath } from "../utils/imagePath";
 
 const products = [
   {
@@ -13,7 +14,7 @@ const products = [
     campus: "Talamban Campus",
     condition: "Like New",
     posted: "Posted 10m ago",
-    image: "/images/chemistry.jpg"
+    image: imagePath("chemistry.jpg")
   },
   {
     id: 2,
@@ -23,7 +24,7 @@ const products = [
     campus: "Downtown Campus",
     condition: "Like New",
     posted: "Posted 1h ago",
-    image: "/images/calculator.jpg"
+    image: imagePath("calculator.jpg")
   },
   {
     id: 3,
@@ -33,7 +34,7 @@ const products = [
     campus: "Talamban Campus",
     condition: "Used",
     posted: "Posted 3h ago",
-    image: "/images/labcoat.jpg"
+    image: imagePath("labcoat.jpg")
   },
   {
     id: 4,
@@ -43,7 +44,7 @@ const products = [
     campus: "Downtown Campus",
     condition: "New",
     posted: "Posted 5h ago",
-    image: "/images/drawingboard.jpg"
+    image: imagePath("drawingboard.jpg")
   },
   {
     id: 5,
@@ -53,7 +54,7 @@ const products = [
     campus: "Downtown Campus",
     condition: "Used",
     posted: "Posted 1d ago",
-    image: "/images/ipad.jpg"
+    image: imagePath("ipad.jpg")
   },
   {
     id: 6,
@@ -63,7 +64,7 @@ const products = [
     campus: "Downtown Campus",
     condition: "New",
     posted: "Posted 1d ago",
-    image: "/images/notebook.jpg"
+    image: imagePath("notebook.jpg")
   },
   {
     id: 7,
@@ -73,7 +74,7 @@ const products = [
     campus: "Talamban Campus",
     condition: "Like New",
     posted: "Posted 2d ago",
-    image: "/images/markers.jpg"
+    image: imagePath("markers.jpg")
   },
   {
     id: 8,
@@ -83,7 +84,7 @@ const products = [
     campus: "Downtown Campus",
     condition: "Used",
     posted: "Posted 3d ago",
-    image: "/images/hoodie.jpg"
+    image: imagePath("hoodie.jpg")
   }
 ];
 
@@ -102,7 +103,7 @@ export default function Marketplace() {
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.name
       .toLowerCase()
-      .includes(search.toLowerCase());
+      .includes(search.trim().toLowerCase());
 
     const matchesCategory =
       category === "All Items" ||
@@ -111,58 +112,47 @@ export default function Marketplace() {
     return matchesSearch && matchesCategory;
   });
 
-  function handleSearch(e) {
+  const handleSearch = (e) => {
     e.preventDefault();
     setSearch(searchInput);
-  }
+  };
 
   return (
     <main className="marketplace">
-        <section className="hero marketplace-hero">
-        <h1>
-            Buy & Sell <span>Academic Essentials.</span>
-        </h1>
-
-        <div className="marketplace-switch">
-            <Link to="/marketplace" className="selected">
-            <LayoutGrid size={15} />
-            View Listings
-            </Link>
-
-            <Link to="/marketplace/create">
-            <PlusCircle size={15} />
-            Create Listing
-            </Link>
-        </div>
+      <section className="hero marketplace-hero">
+        <MarketplaceHeader />
 
         <form className="search-bar" onSubmit={handleSearch}>
-            <Search className="search-icon" size={20} />
+          <Search className="search-icon" size={20} />
 
-            <input
+          <input
             type="text"
             placeholder="Search textbooks, lab gear, calculators, notes..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            />
+          />
 
-            <select
+          <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            >
+          >
             <option value="All Items">All Categories</option>
             <option value="Textbooks">Textbooks</option>
             <option value="Electronics">Electronics</option>
             <option value="Supplies">Supplies</option>
-            </select>
+          </select>
 
-            <button type="submit">Search</button>
+          <button type="submit">
+            Search
+          </button>
         </form>
-        </section>
+      </section>
 
       <section className="listings">
         <div className="listings-header">
           <div className="listing-title">
             <h2>Active Listings</h2>
+
             <span>
               • {filteredProducts.length} items available
             </span>
@@ -172,6 +162,7 @@ export default function Marketplace() {
             {categories.map((item) => (
               <button
                 key={item}
+                type="button"
                 className={category === item ? "selected" : ""}
                 onClick={() => setCategory(item)}
               >
